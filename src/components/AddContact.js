@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+import ContactList from "./ContactList";
 function AddContact({ userId, addNewContact }) {
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
@@ -18,7 +18,6 @@ function AddContact({ userId, addNewContact }) {
             // Add the new contact to the list immediately
             addNewContact({ id: response.data.id, name, phone });
 
-            // alert(response.data.message);
             setName("");
             setPhone("");
         } catch (error) {
@@ -31,29 +30,35 @@ function AddContact({ userId, addNewContact }) {
         <div className="mt-4">
             <h4>Add New Contact</h4>
             <form onSubmit={handleAddContact}>
-                <div className="mb-3">
-                    <label className="form-label">Name</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                    />
+                <div className="d-flex align-items-center mb-3">
+                    <div className="me-3 flex-grow-1">
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="me-3 flex-grow-1">
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Contact Number"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-success">
+                        Save
+                    </button>
                 </div>
-                <div className="mb-3">
-                    <label className="form-label">Phone</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit" className="btn btn-primary">Add Contact</button>
             </form>
         </div>
+
+
     );
 }
 

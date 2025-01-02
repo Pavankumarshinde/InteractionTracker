@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+// import "bootstrap-icons/font/bootstrap-icons.css";
 
 function Interactions({ selectedContactId }) {
     const [interactions, setInteractions] = useState([]);
@@ -45,10 +46,13 @@ function Interactions({ selectedContactId }) {
 
     return (
         <div className="mt-4">
-            <h4>Interactions</h4>
+            <h4 className="text-primary">
+                <i className="bi bi-chat-dots"></i> Interactions
+            </h4>
             {selectedContactId ? (
-                <div>
-                    <div className="mb-3">
+                <>
+                    {/* Input for adding interactions */}
+                    <div className="input-group mb-3">
                         <input
                             type="text"
                             className="form-control"
@@ -56,29 +60,48 @@ function Interactions({ selectedContactId }) {
                             onChange={(e) => setInteractionText(e.target.value)}
                             placeholder="Add an interaction"
                         />
+                        <button
+                            onClick={handleAddInteraction}
+                            className="btn btn-success"
+                            title="Add Interaction"
+                        >
+                            Add <i className="bi bi-plus-circle"></i>
+                        </button>
                     </div>
-                    <button
-                        onClick={handleAddInteraction}
-                        className="btn btn-primary"
-                    >
-                        Add Interaction
-                    </button>
 
-                    <ul className="list-group mt-3">
+                    {/* Scrollable box for interactions */}
+                    <div
+                        style={{
+                            border: "1px solid #ccc",
+                            borderRadius: "5px",
+                            height: "320px", // Adjust height as needed
+                            overflowY: "scroll",
+                            padding: "10px",
+                        }}
+                    >
                         {interactions.length > 0 ? (
-                            interactions.map((interaction, index) => (
-                                <li key={index} className="list-group-item">
-                                    {interaction.interaction} -{" "}
-                                    {new Date(interaction.createdAt).toLocaleString()}
-                                </li>
+                            [...interactions].reverse().map((interaction, index) => (
+                                <div key={index} className="list-group-item list-group-item-action">
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i className="bi bi-person-circle text-secondary me-2"></i>
+                                            {interaction.interaction || "No details provided"}
+                                        </div>
+                                        <small className="text-muted">
+                                            {interaction.createdAt
+                                                ? new Date(interaction.createdAt).toLocaleString()
+                                                : "Date unavailable"}
+                                        </small>
+                                    </div>
+                                </div>
                             ))
                         ) : (
-                            <p>No interactions found for this contact.</p>
+                            <p className="text-muted">No interactions found for this contact.</p>
                         )}
-                    </ul>
-                </div>
+                    </div>
+                </>
             ) : (
-                <p>Select a contact to see interactions.</p>
+                <p className="text-muted">Select a contact to see interactions.</p>
             )}
         </div>
     );
