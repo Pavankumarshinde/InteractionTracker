@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/InteractionTracker/static/css/main.ca67ef22.css",
+    "main.js": "/InteractionTracker/static/js/main.05636851.js",
+    "static/js/488.5dc00adb.chunk.js": "/InteractionTracker/static/js/488.5dc00adb.chunk.js",
+    "index.html": "/InteractionTracker/index.html",
+    "main.ca67ef22.css.map": "/InteractionTracker/static/css/main.ca67ef22.css.map",
+    "main.05636851.js.map": "/InteractionTracker/static/js/main.05636851.js.map",
+    "488.5dc00adb.chunk.js.map": "/InteractionTracker/static/js/488.5dc00adb.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ca67ef22.css",
+    "static/js/main.05636851.js"
+  ]
+}
