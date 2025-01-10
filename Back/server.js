@@ -39,9 +39,11 @@ async function initializeDatabase() {
                 user_id INT REFERENCES accounts(id) ON DELETE CASCADE,
                 contact_id INT REFERENCES contacts(id) ON DELETE CASCADE,
                 interaction TEXT NOT NULL,
+                interactionType VARCHAR(50) NOT NULL, 
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         `);
+
 
         console.log("Database initialized successfully");
     } catch (error) {
@@ -127,21 +129,22 @@ app.get("/api/get-contacts/:userId", async (req, res) => {
 });
 // Add interaction
 app.post("/api/add-interaction", async (req, res) => {
-    const { contactId, interaction } = req.body;
+    const { contactId, interaction, interactionType } = req.body;
 
-    if (!contactId || !interaction) {
+    if (!contactId || !interaction || !interactionType) {
         return res.status(400).json({ error: "All fields are required" });
     }
 
     try {
         const result = await db.query(
-            "INSERT INTO interactions (contact_id, interaction) VALUES ($1, $2) RETURNING id, created_at",
-            [contactId, interaction]
+            `INSERT INTO interactions (contact_id, interaction, interactionType)
+             VALUES ($1, $2, $3) RETURNING id, created_at`,
+            [contactId, interaction, interactionType]
         );
         res.json({
             id: result.rows[0].id,
             createdAt: result.rows[0].created_at,
-            message: "Interaction added successfully",
+            message: "Interaction added successfully"
         });
     } catch (error) {
         console.error("Error adding interaction:", error);
@@ -149,8 +152,6 @@ app.post("/api/add-interaction", async (req, res) => {
     }
 });
 
-
-// Get interactions
 app.get("/api/get-interactions/:contactId", async (req, res) => {
     const { contactId } = req.params;
 
@@ -159,7 +160,10 @@ app.get("/api/get-interactions/:contactId", async (req, res) => {
     }
 
     try {
-        const result = await db.query("SELECT interaction, created_at FROM interactions WHERE contact_id = $1", [contactId]);
+        const result = await db.query(
+            "SELECT interaction, interactionType, created_at FROM interactions WHERE contact_id = $1",
+            [contactId]
+        );
         res.json(result.rows);
     } catch (error) {
         console.error("Error fetching interactions:", error);

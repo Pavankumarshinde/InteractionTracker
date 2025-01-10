@@ -4,6 +4,7 @@ import axios from "axios";
 function Interactions({ selectedContactId }) {
     const [interactions, setInteractions] = useState([]);
     const [interactionText, setInteractionText] = useState("");
+    const [interactionType, setInteractionType] = useState("notes");
 
     useEffect(() => {
         if (selectedContactId) {
@@ -14,7 +15,8 @@ function Interactions({ selectedContactId }) {
                     );
                     const transformedData = response.data.map((item) => ({
                         ...item,
-                        createdAt: item.created_at || null, // Handle missing date
+                        createdAt: item.created_at || null,
+                        interactionType: item.interactiontype || "Unknown",
                     }));
                     setInteractions(transformedData);
                 } catch (error) {
@@ -33,77 +35,59 @@ function Interactions({ selectedContactId }) {
             const response = await axios.post("http://localhost:5000/api/add-interaction", {
                 contactId: selectedContactId,
                 interaction: interactionText,
+                interactionType
             });
 
-            const newInteraction = {
-                interaction: interactionText,
-                createdAt: new Date(), // Set date locally for immediate UI update
-            };
-
+            setInteractions((prev) => [
+                ...prev,
+                { interactionType, interaction: interactionText, createdAt: new Date() }
+            ]);
             setInteractionText("");
-            setInteractions((prev) => [...prev, newInteraction]);
         } catch (error) {
             console.error("Error adding interaction:", error);
         }
     };
 
     return (
-        <div className="mt-4">
-            <h4 className="text-primary">
-                <i className="bi bi-chat-dots"></i> Interactions {selectedContactId}
-            </h4>
-            {selectedContactId ? (
-                <>
-                    <div className="input-group mb-3">
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={interactionText}
-                            onChange={(e) => setInteractionText(e.target.value)}
-                            placeholder="Add an interaction"
-                        />
-                        <button
-                            onClick={handleAddInteraction}
-                            className="btn btn-success"
-                            title="Add Interaction"
-                        >
-                            Add <i className="bi bi-plus-circle"></i>
-                        </button>
-                    </div>
+        <div className="container mt-4">
+            <h4 className="mb-3">Interactions for Contact {selectedContactId}</h4>
 
-                    <div
-                        style={{
-                            border: "1px solid #ccc",
-                            borderRadius: "5px",
-                            height: "320px",
-                            overflowY: "scroll",
-                            padding: "10px",
-                        }}
-                    >
-                        {interactions.length > 0 ? (
-                            [...interactions].reverse().map((interaction, index) => (
-                                <div key={index} className="list-group-item list-group-item-action">
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <i className="bi bi-person-circle text-secondary me-2"></i>
-                                            {interaction.interaction || "No details provided"}
-                                        </div>
-                                        <small className="text-muted">
-                                            {interaction.createdAt
-                                                ? new Date(interaction.createdAt).toLocaleString()
-                                                : "Date unavailable"}
-                                        </small>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-muted">No interactions found for this contact.</p>
-                        )}
-                    </div>
-                </>
-            ) : (
-                <p className="text-muted">Select a contact to see interactions.</p>
-            )}
+            {/* Input Group */}
+            <div className="input-group mb-3">
+                <select
+                    value={interactionType}
+                    onChange={(e) => setInteractionType(e.target.value)}
+                    className="form-select"
+                >
+                    <option value="notes">Notes</option>
+                    <option value="payments">Payments</option>
+                    <option value="meetings">Meetings</option>
+                </select>
+                <input
+                    type="text"
+                    value={interactionText}
+                    onChange={(e) => setInteractionText(e.target.value)}
+                    placeholder="Add an interaction"
+                    className="form-control"
+                />
+                <button className="btn btn-primary" onClick={handleAddInteraction}>Add</button>
+            </div>
+
+            {/* Interactions Display */}
+            <div className="list-group">
+                {interactions.length > 0 ? (
+                    interactions.map((interaction, index) => (
+                        <div key={index} className="list-group-item">
+                            <strong className="text-primary">{interaction.interactionType}:</strong> {interaction.interaction}
+                            <span className="text-muted ms-3">
+                                {interaction.createdAt ? new Date(interaction.createdAt).toLocaleString() : "Date Unavailable"}
+                            </span>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-muted">No interactions found for this contact.</p>
+                )}
+            </div>
         </div>
     );
 }
