@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { OAuth2Client } = require("google-auth-library");
 const db = require("./database");
-
+const { google } = require('googleapis');
 const app = express();
 
 // Middleware
@@ -12,6 +12,35 @@ app.use(express.json());
 // Google OAuth configuration
 const GOOGLE_CLIENT_ID = "192146573225-s6ln6e0vu4jp5htq5qo75hndl7a9d1fu.apps.googleusercontent.com";
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+
+
+
+// Fetch Google contacts route
+app.get("/api/google-contacts", async (req, res) => {
+    const { token } = req.query;
+    if (!token) return res.status(400).json({ error: "Token is required" });
+
+    try {
+        const oauth2Client = new google.auth.OAuth2();
+        oauth2Client.setCredentials({ access_token: token });
+
+        const people = google.people({ version: 'v1', auth: oauth2Client });
+        const response = await people.people.connections.list({
+            resourceName: 'people/me',
+            personFields: 'names,phoneNumbers',
+        });
+
+        const contacts = response.data.connections.map(contact => ({
+            name: contact.names?.[0]?.displayName || 'No Name',
+            phone: contact.phoneNumbers?.[0]?.value || 'No Phone',
+        }));
+
+        res.json(contacts);
+    } catch (error) {
+        console.error("Error fetching contacts:", error);
+        res.status(500).json({ error: "Failed to fetch contacts" });
+    }
+});
 
 // Simplified Database initialization
 async function initializeDatabase() {
