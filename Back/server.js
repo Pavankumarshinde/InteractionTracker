@@ -136,10 +136,13 @@ app.post("/api/add-interaction", async (req, res) => {
     }
 
     try {
+        const { userId, contactId, interaction, interactionType } = req.body;
         const result = await db.query(
-            `INSERT INTO interactions (contact_id, interaction, interactionType)
-             VALUES ($1, $2, $3) RETURNING id, created_at`,
-            [contactId, interaction, interactionType]
+            `INSERT INTO interactions (user_id, contact_id, interaction, interactionType)
+             VALUES ($1, $2, $3, $4) RETURNING id, created_at`,
+            [userId, contactId, interaction, interactionType]
+
+
         );
         res.json({
             id: result.rows[0].id,

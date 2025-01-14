@@ -5,8 +5,9 @@ import AddContact from "./components/AddContact";
 import ContactList from "./components/ContactList";
 import Interactions from "./components/Interactions";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import { FaUserPlus, FaSignOutAlt } from "react-icons/fa";
+import contactImage from "C:/Users/shind/Reactjs/InteractionTracker/client/client/src/components/contactimage.webp";
 
+const imageSrc = contactImage;
 function App() {
   const [user, setUser] = useState(null);
   const [contacts, setContacts] = useState([]);
@@ -53,48 +54,78 @@ function App() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="text-center">
-        <h1 className="mb-4" style={{ fontFamily: "Montserrat, sans-serif", fontWeight: "bold" }}>
+    <div className="container mt-4">
+      <header className="d-flex align-items-center justify-content-between mb-4">
+        {user && (
+          <div className="d-flex align-items-center">
+            <img
+              src={imageSrc || "default-avatar.png"}
+              alt="User Avatar"
+              className="rounded-circle"
+              style={{ width: "40px", height: "40px", marginRight: "10px" }}
+            />
+            <span>{user.name || user.email}</span>
+          </div>
+        )}
+
+        <h1
+          className="text-center flex-grow-1"
+          style={{
+            fontFamily: "Poppins, sans-serif",
+            fontWeight: "500",
+            fontSize: "1.8rem",
+            margin: 0,
+          }}
+        >
           Person Centralized Interaction Tracker
         </h1>
-        {!user ? (
+
+        {user && (
+          <button
+            className="btn btn-outline-danger"
+            style={{ fontSize: "0.9rem", padding: "6px 12px" }}
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        )}
+      </header>
+
+      {!user ? (
+        <div className="text-center">
           <GoogleLogin
             onSuccess={handleLoginSuccess}
             onError={() => console.error("Login Failed")}
+            theme="outline"
+            text="signin_with"
+            shape="rectangular"
+            width="250"
+            logo_alignment="center"
           />
-        ) : (
-          <div>
-            <h3>Welcome, {user.email}!</h3>
-            <button className="btn btn-outline-danger mt-3" onClick={handleLogout}>
-              {/* <FaSignOutAlt className="me-2" /> */}
-              Logout
-            </button>
-
-            <div className="row mt-4">
-              <div className="col-md-6">
-                <div className="card p-3 shadow-sm">
-                  <AddContact userId={user.userId} addNewContact={addNewContact} />
-                </div>
-                <div className="card mt-3 p-3 shadow-sm">
-                  <ContactList
-                    contacts={contacts}
-                    onSelectContact={setSelectedContact}
-                    selectedContactId={selectedContact?.id}
-                  />
-                </div>
-              </div>
-              <div className="col-md-6">
-                {selectedContact && (
-                  <div className="card p-3 shadow-sm">
-                    <Interactions selectedContactId={selectedContact.id} />
-                  </div>
-                )}
-              </div>
+        </div>
+      ) : (
+        <div className="row mt-4">
+          <div className="col-md-6">
+            <div className="card p-3 shadow-sm mb-3">
+              <AddContact userId={user.userId} addNewContact={addNewContact} />
+            </div>
+            <div className="card mt-3 p-3 shadow-sm">
+              <ContactList
+                contacts={contacts}
+                onSelectContact={setSelectedContact}
+                selectedContactId={selectedContact?.id}
+              />
             </div>
           </div>
-        )}
-      </div>
+          <div className="col-md-6">
+            {selectedContact && (
+              <div className="card p-3 shadow-sm">
+                <Interactions selectedContactId={selectedContact.id} />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
